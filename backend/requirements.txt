@@ -1,0 +1,23 @@
+# Web Framework
+fastapi>=0.136.0
+uvicorn[standard]>=0.46.0
+python-multipart>=0.0.27
+
+# Deep Learning & Image Processing
+torch>=2.0.0
+torchvision>=0.15.0
+opencv-python>=4.8.0
+numpy>=1.26.0
+Pillow>=10.0.0
+
+# ML Libraries
+scikit-image>=0.26.0
+scikit-learn>=1.3.0
+scipy>=1.11.0
+
+# Environment & API
+python-dotenv>=1.0.0
+google-generativeai>=0.3.0
+
+# Production Server
+gunicorn>=21.0.0

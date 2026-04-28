@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: passive-liveness-api
+    env: python
+    plan: standard  # Change to 'free' for testing, 'standard' for production
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port 10000
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
+      - key: GEMINI_API_KEY
+        scope: run_and_build
+      - key: PORT
+        value: 10000
+        scope: run_and_build
+      - key: CORS_ALLOWED_ORIGINS
+        value: "https://your-frontend-domain.vercel.app,http://localhost:5173"
+        scope: run_and_build
+    root: backend
+    domains:
+      - example.onrender.com  # Replace with your domain

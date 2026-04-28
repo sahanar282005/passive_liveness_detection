@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "10000:10000"
+    environment:
+      PORT: 10000
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      LOG_LEVEL: INFO
+    volumes:
+      - ./backend/model.pth:/app/model.pth:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:10000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - liveness
+
+  # Optional: Frontend (uncomment if using)
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #   ports:
+  #     - "5173:5173"
+  #   environment:
+  #     VITE_API_URL: http://localhost:10000
+  #   depends_on:
+  #     api:
+  #       condition: service_healthy
+  #   networks:
+  #     - liveness
+
+networks:
+  liveness:
+    driver: bridge
+
+volumes:
+  # Add any persistent volumes here if needed
