@@ -100,7 +100,7 @@ logger.info(f"CORS allowed origins: {cors_allowed_origins}")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_allowed_origins,  # In production, restrict to specific frontend domains
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],  # Allows all HTTP methods (GET, POST, etc.)
     allow_headers=["*"],  # Allows all headers
 )

@@ -503,12 +503,25 @@ function UploadPanel({ onAnalyze, scanning, imagePreview, setImagePreview, selec
   const [drag, setDrag] = useState(false);
 
   const handleFile = (file) => {
-    if (!file) return;
+    if (!file) {
+      console.warn("No file provided to handleFile");
+      return;
+    }
+    
+    console.log("File selected:", file.name, file.type, file.size, "bytes");
+    
+    // Set file first
     setSelectedFile(file);
+    
+    // Read preview
     const reader = new FileReader();
-    reader.onload = (e) => { setImagePreview(e.target.result); };
+    reader.onload = (e) => {
+      console.log("Image preview ready");
+      setImagePreview(e.target.result);
+      // Call analyze after preview is ready
+      onAnalyze(file);
+    };
     reader.readAsDataURL(file);
-    onAnalyze(file);
   };
 
   return (
@@ -831,6 +844,14 @@ export default function App() {
   const [error, setError] = useState(null);
 
   const runAnalysis = useCallback(async (file) => {
+    console.log("API CALLED - Starting analysis for file:", file?.name);
+    
+    if (!file) {
+      console.error("No file provided to runAnalysis");
+      setError("No file selected");
+      return;
+    }
+
     setScanning(true);
     setLogs([]);
     setResult(null);
@@ -839,26 +860,35 @@ export default function App() {
     try {
       const formData = new FormData();
       formData.append('file', file);
+      
+      console.log("FormData created with file:", file.name, file.size, "bytes");
 
       setLogs([{ msg: "Image sent to API", type: "info" }]);
 
       setTimeout(() => setLogs(prev => [...prev, { msg: "Processing with ResNet18", type: "info" }]), 500);
 
-      // Get API URL from environment variable (VITE_API_URL)
-      // For local development: use http://localhost:10000
-      // For production: set VITE_API_URL to your deployed backend URL
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:10000';
+      // Use deployed Render backend directly
+      const apiUrl = 'https://passive-liveness-detection.onrender.com';
+      console.log("Using API URL:", apiUrl);
       
-      const response = await fetch(`${apiUrl}/analyze`, {
+      const fetchUrl = `${apiUrl}/analyze`;
+      console.log("Fetching from:", fetchUrl);
+      
+      const response = await fetch(fetchUrl, {
         method: 'POST',
         body: formData,
       });
 
+      console.log("Response status:", response.status, response.statusText);
+
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Response error:", errorText);
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
       const data = await response.json();
+      console.log("Response data received:", data);
 
       setTimeout(() => {
         setResult(data);
@@ -869,6 +899,7 @@ export default function App() {
       }, 1000);
 
     } catch (err) {
+      console.error("Analysis error:", err);
       setError(err.message);
       setLogs([{ msg: "Error: " + err.message, type: "error" }]);
       setScanning(false);

@@ -56,7 +56,6 @@ Thumbs.db
 backend/celeba_spoof_extracted/
 backend/dataset/
 backend/test_organize/
-*.pth
 *.pt
 *.zip
 *.jpg
